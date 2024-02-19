@@ -1,0 +1,120 @@
+import java.util.*;
+
+// Define User class
+class User {
+    private String username;
+    private String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+// Define Reservation class
+class Reservation {
+    private int reservationId;
+    private User user;
+    private String train;
+    private Date date;
+
+    public Reservation(int reservationId, User user, String train, Date date) {
+        this.reservationId = reservationId;
+        this.user = user;
+        this.train = train;
+        this.date = date;
+    }
+
+    public int getReservationId() {
+        return reservationId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getTrain() {
+        return train;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+}
+
+// Define ReservationSystem class
+class ReservationSystem {
+    private List<User> users = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
+    private int nextReservationId = 1;
+
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    public User authenticateUser(String username, String password) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public int makeReservation(User user, String train, Date date) {
+        Reservation reservation = new Reservation(nextReservationId++, user, train, date);
+        reservations.add(reservation);
+        return reservation.getReservationId();
+    }
+
+    public boolean cancelReservation(int reservationId) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getReservationId() == reservationId) {
+                reservations.remove(reservation);
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Initialize reservation system
+        ReservationSystem reservationSystem = new ReservationSystem();
+
+        // Add some users (for demo purposes)
+        reservationSystem.addUser(new User("user1", "password1"));
+        reservationSystem.addUser(new User("user2", "password2"));
+
+        // Simulate user login (authentication)
+        User authenticatedUser = reservationSystem.authenticateUser("user1", "password1");
+        if (authenticatedUser != null) {
+            System.out.println("User authenticated: " + authenticatedUser.getUsername());
+        } else {
+            System.out.println("Authentication failed. Invalid username or password.");
+        }
+
+        // Simulate reservation creation
+        if (authenticatedUser != null) {
+            int reservationId = reservationSystem.makeReservation(authenticatedUser, "Train A", new Date());
+            System.out.println("Reservation created. Reservation ID: " + reservationId);
+        }
+
+        // Simulate reservation cancellation
+        boolean cancellationResult = reservationSystem.cancelReservation(1);
+        if (cancellationResult) {
+            System.out.println("Reservation cancelled successfully.");
+        } else {
+            System.out.println("Cancellation failed. Reservation not found.");
+        }
+    }
+}
